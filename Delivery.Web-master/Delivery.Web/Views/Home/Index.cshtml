@@ -1,0 +1,19 @@
+﻿@model List<Delivery.Web.Models.Restaurant>
+
+<h1>Delivery</h1>
+
+<h2>Restaurantes</h2>
+
+@foreach (var restaurant in Model)
+{
+    <div class="restaurant">
+
+        <h3>@restaurant.Name</h3>
+
+        <a href="/Home/Menu/@restaurant.Id"
+           class="menu-link">
+            Ver cardápio
+        </a>
+
+    </div>
+}

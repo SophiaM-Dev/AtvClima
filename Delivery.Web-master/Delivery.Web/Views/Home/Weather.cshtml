@@ -1,0 +1,212 @@
+﻿
+@{
+    ViewData["Title"] = "Clima para entregas";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/weather.css" asp-append-version="true" />
+}
+
+<section class="weather-dashboard">
+    <div class="weather-header">
+        <div>
+            <p class="weather-eyebrow">DELIVERY • MONITORAMENTO</p>
+            <h1>Clima para entregas</h1>
+            <p>Consulte as condições meteorológicas da sua região.</p>
+        </div>
+
+        <button id="themeButton" class="weather-button secondary"
+                type="button" aria-pressed="false">
+            Alternar tema
+        </button>
+    </div>
+
+    <form id="weatherForm" class="weather-search">
+        <div class="search-field">
+            <label for="cityInput">Cidade</label>
+            <input id="cityInput" name="city"
+                   placeholder="Ex.: Brotas" autocomplete="address-level2"
+                   required />
+        </div>
+
+        <div class="search-field">
+            <label for="countryInput">País</label>
+            <select id="countryInput" name="country">
+                <option value="BR">Brasil (BR)</option>
+                <option value="US">Estados Unidos (US)</option>
+                <option value="PT">Portugal (PT)</option>
+                <option value="AR">Argentina (AR)</option>
+                <option value="GB">Reino Unido (GB)</option>
+            </select>
+        </div>
+
+        <button class="weather-button primary" type="submit">
+            Consultar clima
+        </button>
+    </form>
+
+    <div class="weather-actions">
+        <button id="favoriteButton" class="weather-button secondary"
+                type="button">
+            ☆ Salvar cidade favorita
+        </button>
+        <button id="favoriteSearchButton" class="weather-button secondary"
+                type="button">
+            Consultar favorita
+        </button>
+    </div>
+
+    <p id="loadingMessage" class="status-message" role="status"
+       aria-live="polite" hidden>
+        Consultando dados meteorológicos...
+    </p>
+
+    <div id="errorMessage" class="error-message" role="alert"
+         aria-live="assertive" hidden></div>
+
+    <div id="resultSection" hidden>
+        <div class="location-heading">
+            <div>
+                <h2 id="locationName">Localização</h2>
+                <p id="weatherDescription">Condição climática</p>
+            </div>
+            <span id="weatherIcon" class="weather-icon"
+                  role="img" aria-label="Condição do tempo">🌤️</span>
+        </div>
+
+        <div class="weather-cards">
+            <article class="weather-card">
+                <span>Temperatura</span>
+                <strong id="temperatureValue">-- °C</strong>
+                <small>Temperatura atual</small>
+            </article>
+
+            <article class="weather-card">
+                <span>Sensação térmica</span>
+                <strong id="feelsLikeValue">-- °C</strong>
+                <small>Como o ambiente é percebido</small>
+            </article>
+
+            <article class="weather-card">
+                <span>Umidade</span>
+                <strong id="humidityValue">--%</strong>
+                <small>Umidade relativa do ar</small>
+            </article>
+
+            <article class="weather-card">
+                <span>Vento</span>
+                <strong id="windValue">-- km/h</strong>
+                <small id="windDirection">Direção não disponível</small>
+            </article>
+
+            <article class="weather-card">
+                <span>Temperatura mínima</span>
+                <strong id="minValue">-- °C</strong>
+                <small>Previsão do dia</small>
+            </article>
+
+            <article class="weather-card">
+                <span>Temperatura máxima</span>
+                <strong id="maxValue">-- °C</strong>
+                <small>Previsão do dia</small>
+            </article>
+
+            <article class="weather-card">
+                <span>Pressão atmosférica</span>
+                <strong id="pressureValue">-- hPa</strong>
+                <small>Pressão ao nível informado pela API</small>
+            </article>
+
+            <article class="weather-card">
+                <span>Nascer e pôr do sol</span>
+                <strong id="sunriseValue">--:--</strong>
+                <small id="sunsetValue">Pôr do sol: --:--</small>
+            </article>
+        </div>
+
+        <article class="weather-panel">
+            <h2>Atenção para as entregas</h2>
+            <p id="deliveryAlert" role="status">
+                Consulte uma cidade para avaliar as condições.
+            </p>
+            <small>
+                Este indicador é apenas informativo. Avalie as condições
+                reais e priorize a segurança dos entregadores.
+            </small>
+        </article>
+
+        <article class="weather-panel">
+            <h2>Previsão das próximas horas</h2>
+            <p>Temperatura e umidade previstas pela OpenWeatherMap.</p>
+            <div class="chart-container">
+                <canvas id="weatherChart"
+                        role="img"
+                        aria-label="Gráfico de temperatura e umidade para as próximas horas">
+                    Gráfico de previsão meteorológica.
+                </canvas>
+            </div>
+        </article>
+
+        <p class="last-update">
+            Última atualização: <strong id="updateTime">--</strong>
+        </p>
+    </div>
+
+    <div class="weather-columns">
+        <article class="weather-panel">
+            <h2>Histórico de consultas</h2>
+            <ul id="historyList" class="weather-list">
+                <li>Nenhuma consulta realizada.</li>
+            </ul>
+            <button id="clearHistoryButton"
+                    class="weather-button secondary" type="button">
+                Limpar histórico
+            </button>
+        </article>
+
+        <article class="weather-panel">
+            <h2>Status MQTT</h2>
+            <p id="mqttStatus" role="status" aria-live="polite">
+                MQTT desconectado.
+            </p>
+            <p class="mqtt-topic">
+                Tópico: <code>delivery/weather/status</code>
+            </p>
+            <button id="mqttButton" class="weather-button secondary"
+                    type="button">
+                Conectar MQTT
+            </button>
+            <button id="publishButton" class="weather-button primary"
+                    type="button" disabled>
+                Publicar clima
+            </button>
+            <small>
+                Conexão de demonstração por WebSocket. Para uso real,
+                configure um broker autorizado.
+            </small>
+        </article>
+    </div>
+
+    <section class="weather-panel api-settings">
+        <h2>Configuração meteorológica</h2>
+        <label for="apiKeyInput">Chave da API OpenWeatherMap</label>
+        <input id="apiKeyInput" type="password"
+               autocomplete="off"
+               placeholder="Cole sua API Key aqui" />
+        <button id="saveApiKeyButton"
+                class="weather-button secondary" type="button">
+            Salvar chave neste navegador
+        </button>
+        <small>
+            A chave é armazenada no navegador para este projeto escolar.
+            Não publique uma chave real no GitHub nem a inclua em capturas
+            de tela. Em produção, prefira proteger a chave no servidor.
+        </small>
+    </section>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="~/js/weather.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,31 @@
+﻿@model Delivery.Web.Models.Order
+
+<h1>Acompanhamento do pedido</h1>
+
+<p>
+    Pedido:
+    <strong id="orderId">
+        #@Model.Id
+    </strong>
+</p>
+
+<p>
+    Status:
+    <strong id="orderStatus">
+        @Model.Status
+    </strong>
+</p>
+
+<p>
+    Pagamento:
+    <strong id="paymentMethod">
+        @Model.PaymentMethod
+    </strong>
+</p>
+
+<p>
+    Total:
+    <strong id="orderTotal">
+        R$ @Model.Total.ToString("F2")
+    </strong>
+</p>

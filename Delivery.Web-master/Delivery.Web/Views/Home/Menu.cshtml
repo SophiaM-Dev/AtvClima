@@ -1,0 +1,49 @@
+﻿@model Delivery.Web.Models.Restaurant
+
+<h1>@Model.Name</h1>
+
+<h2>Cardápio</h2>
+
+@foreach (var product in Model.Products)
+{
+    <div class="product">
+
+        <h3>@product.Name</h3>
+
+        <p>
+            R$ @product.Price.ToString("F2")
+        </p>
+
+        <form method="post"
+              action="/Order/Create">
+
+            <input type="hidden"
+                   name="productId"
+                   value="@product.Id" />
+
+            <select name="paymentMethod"
+                    class="payment">
+
+                <option value="">
+                    Selecione o pagamento
+                </option>
+
+                <option value="PIX">
+                    PIX
+                </option>
+
+                <option value="Cartão">
+                    Cartão
+                </option>
+
+            </select>
+
+            <button type="submit"
+                    class="confirm-order">
+                Confirmar pedido
+            </button>
+
+        </form>
+
+    </div>
+}
